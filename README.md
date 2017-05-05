@@ -9,12 +9,23 @@ modules (http://de.slideshare.net/rainergerhards1/writing-rsyslog-p).
 Possibly useful if you need to modify messages. Otherwise use rsyslog's own
 `omrabbitmq` instead.
 
-Example configuration in rsyslog.conf:
+Example configuration in amqp.conf:
 ```
-    $template My_JSON_Fmt,"{%msg:::jsonf%,%HOSTNAME:::jsonf%,%syslogfacility:::jsonf%,%syslogpriority:::jsonf%,%timereported:::date-rfc3339,jsonf%,%timegenerated:::date-rfc3339,jsonf%}\n"
-
+    $template(name="gelf" type="list") {
+    constant(value="{\"version\":\"1.1\",")
+    constant(value="\"host\":\"")
+    property(name="hostname")
+    constant(value="\",\"short_message\":\"")
+    property(name="msg" format="json")
+    constant(value="\",\"timestamp\":\"")
+    property(name="timegenerated" dateformat="unixtimestamp")
+    constant(value="\",\"level\":\"")
+    property(name="syslogseverity")
+    constant(value="\"}")
+}
+module(load="omprog")
     *.*        action(type="omprog"
-                      template="My_JSON_Fmt"
+                      template="gelf"
                       binary="om_amqp.py --server broker.local ...")
 ```
 
