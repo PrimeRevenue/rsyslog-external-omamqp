@@ -91,7 +91,7 @@ def amqp_connect(user, pwd, srv, vhost, queue, exchange, confirm = False):
 	channel = connection.channel()
 
 	# ensure correct server config -- you might want to change this:
-	channel.exchange_declare(exchange=exchange, durable=True, type="fanout")
+	channel.exchange_declare(exchange=exchange, durable=True, type="direct")
 	channel.queue_declare(queue=queue, durable=True)
 	channel.queue_bind(exchange=exchange, queue=queue)
 	
